@@ -4,11 +4,9 @@
 <head>
 
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>SecureGuard | Register</title>
+    <title>SecureGuard | Create Account</title>
 
     <style>
 
@@ -19,84 +17,268 @@
         body {
             margin: 0;
             min-height: 100vh;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
             font-family: Arial, Helvetica, sans-serif;
 
-            background: #0f172a;
-            color: white;
+            background:
+                radial-gradient(circle at top left, #1e3a8a 0%, transparent 35%),
+                radial-gradient(circle at bottom right, #0f766e 0%, transparent 30%),
+                #0f172a;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 30px;
+            color: #0f172a;
         }
 
-        .box {
-            width: 380px;
+        .wrapper {
+            width: 100%;
+            max-width: 980px;
 
-            background: #1e293b;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
 
-            padding: 35px;
+            background: white;
+
+            border-radius: 22px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 25px 70px rgba(0, 0, 0, 0.35);
+        }
+
+        /* LEFT SIDE */
+
+        .brand-section {
+            background: #0f172a;
+
+            padding: 55px 45px;
+
+            color: white;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            margin-bottom: 40px;
+        }
+
+        .shield {
+            width: 52px;
+            height: 52px;
 
             border-radius: 14px;
 
-            box-shadow:
-                0 10px 30px rgba(0, 0, 0, 0.3);
+            background: #2563eb;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 28px;
         }
 
-        h1 {
-            text-align: center;
-            margin-bottom: 8px;
+        .brand h1 {
+            margin: 0;
+            font-size: 28px;
         }
 
-        p {
-            text-align: center;
+        .brand span {
+            display: block;
+            margin-top: 4px;
+
             color: #94a3b8;
+
+            font-size: 10px;
+            letter-spacing: 1.5px;
+        }
+
+        .brand-section h2 {
+            margin: 0 0 15px;
+
+            font-size: 32px;
+            line-height: 1.2;
+        }
+
+        .brand-section p {
+            color: #cbd5e1;
+
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .feature-list {
+            margin-top: 28px;
+        }
+
+        .feature {
+            display: flex;
+            gap: 12px;
+
+            margin: 16px 0;
+
+            color: #e2e8f0;
+
+            font-size: 14px;
+        }
+
+        .tick {
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        /* RIGHT SIDE */
+
+        .form-section {
+            padding: 48px 45px;
+
+            background: #ffffff;
+        }
+
+        .form-section h2 {
+            margin: 0;
+
+            font-size: 29px;
+
+            color: #0f172a;
+        }
+
+        .subtitle {
+            margin: 8px 0 30px;
+
+            color: #64748b;
+
+            font-size: 14px;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 13px;
+
+            font-weight: bold;
+
+            color: #334155;
         }
 
         input {
             width: 100%;
 
-            padding: 12px;
+            padding: 13px 14px;
 
-            margin: 8px 0;
+            border: 1px solid #cbd5e1;
 
-            border: none;
+            border-radius: 10px;
 
-            border-radius: 8px;
-
-            background: #334155;
-
-            color: white;
+            font-size: 14px;
 
             outline: none;
+
+            background: #f8fafc;
+
+            transition: 0.2s;
         }
 
-        input::placeholder {
-            color: #94a3b8;
+        input:focus {
+            border-color: #2563eb;
+
+            background: white;
+
+            box-shadow:
+                0 0 0 3px rgba(37, 99, 235, 0.10);
+        }
+
+        .password-row {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 12px;
+        }
+
+        .strength {
+            height: 5px;
+
+            background: #e2e8f0;
+
+            border-radius: 10px;
+
+            margin-top: 8px;
+
+            overflow: hidden;
+        }
+
+        .strength-bar {
+            height: 100%;
+
+            width: 0%;
+
+            background: #2563eb;
+
+            transition: 0.3s;
+        }
+
+        .security-box {
+            margin: 20px 0;
+
+            padding: 13px;
+
+            border-radius: 10px;
+
+            background: #eff6ff;
+
+            border: 1px solid #dbeafe;
+
+            color: #1e40af;
+
+            font-size: 12px;
+
+            line-height: 1.5;
         }
 
         button {
             width: 100%;
 
-            padding: 12px;
-
-            margin-top: 12px;
-
             border: none;
 
-            border-radius: 8px;
+            padding: 14px;
 
-            background: #16a34a;
+            border-radius: 10px;
+
+            background: #2563eb;
 
             color: white;
 
-            font-size: 16px;
+            font-size: 15px;
+
+            font-weight: bold;
 
             cursor: pointer;
+
+            transition: 0.2s;
         }
 
         button:hover {
-            background: #15803d;
+            background: #1d4ed8;
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
 
         #message {
@@ -104,19 +286,71 @@
 
             text-align: center;
 
-            font-size: 14px;
+            font-size: 13px;
+
+            min-height: 18px;
+        }
+
+        .links {
+            margin-top: 22px;
+
+            text-align: center;
+
+            font-size: 13px;
+
+            color: #64748b;
+        }
+
+        .links a {
+            color: #2563eb;
+
+            text-decoration: none;
+
+            font-weight: bold;
         }
 
         .back {
             display: block;
 
+            margin-top: 16px;
+
             text-align: center;
 
-            margin-top: 18px;
+            color: #64748b;
 
-            color: #60a5fa;
+            font-size: 12px;
 
             text-decoration: none;
+        }
+
+        .back:hover {
+            color: #2563eb;
+        }
+
+        @media (max-width: 800px) {
+
+            .wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .brand-section {
+                padding: 35px 28px;
+            }
+
+            .form-section {
+                padding: 35px 28px;
+            }
+        }
+
+        @media (max-width: 520px) {
+
+            .password-row {
+                grid-template-columns: 1fr;
+            }
+
+            body {
+                padding: 15px;
+            }
         }
 
     </style>
@@ -127,66 +361,213 @@
 <body>
 
 
-<div class="box">
+<div class="wrapper">
 
 
-    <h1>
-        SecureGuard
-    </h1>
+    <!-- LEFT PANEL -->
+
+    <section class="brand-section">
+
+        <div class="brand">
+
+            <div class="shield">
+                🛡️
+            </div>
+
+            <div>
+
+                <h1>SecureGuard</h1>
+
+                <span>
+                    REAL-TIME CYBERSECURITY MONITORING
+                </span>
+
+            </div>
+
+        </div>
 
 
-    <p>
-        Create your security account
-    </p>
+        <h2>
+            Create a Safer Digital Account
+        </h2>
 
 
-    <input
-        id="name"
-        type="text"
-        placeholder="Full Name"
-    >
+        <p>
+            Register with SecureGuard and let our
+            cybersecurity monitoring system detect
+            suspicious authentication activity in real time.
+        </p>
 
 
-    <input
-        id="email"
-        type="email"
-        placeholder="Email"
-    >
+        <div class="feature-list">
+
+            <div class="feature">
+                <span class="tick">✓</span>
+                <span>Real-time authentication monitoring</span>
+            </div>
+
+            <div class="feature">
+                <span class="tick">✓</span>
+                <span>Suspicious login detection</span>
+            </div>
+
+            <div class="feature">
+                <span class="tick">✓</span>
+                <span>Security alert notifications</span>
+            </div>
+
+            <div class="feature">
+                <span class="tick">✓</span>
+                <span>Secure security-event storage</span>
+            </div>
+
+        </div>
+
+    </section>
 
 
-    <input
-        id="password"
-        type="password"
-        placeholder="Password"
-    >
+    <!-- FORM PANEL -->
+
+    <section class="form-section">
+
+        <h2>
+            Create Account
+        </h2>
+
+        <p class="subtitle">
+            Enter your details to register with SecureGuard.
+        </p>
 
 
-    <button onclick="registerUser()">
-
-        Create Account
-
-    </button>
+        <form id="registerForm">
 
 
-    <div id="message"></div>
+            <div class="field">
+
+                <label for="name">
+                    Full Name
+                </label>
+
+                <input
+                    id="name"
+                    type="text"
+                    placeholder="Enter your full name"
+                    required
+                >
+
+            </div>
 
 
-    <a
-        class="back"
-        href="/login.html">
+            <div class="field">
 
-        Already have an account? Login
+                <label for="email">
+                    Email Address
+                </label>
 
-    </a>
+                <input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email address"
+                    required
+                >
+
+            </div>
 
 
-    <a
-        class="back"
-        href="/">
+            <div class="password-row">
 
-        ← Back to Dashboard
 
-    </a>
+                <div class="field">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        id="password"
+                        type="password"
+                        placeholder="Create password"
+                        minlength="6"
+                        required
+                    >
+
+                    <div class="strength">
+
+                        <div
+                            class="strength-bar"
+                            id="strengthBar">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="confirmPassword">
+                        Confirm Password
+                    </label>
+
+                    <input
+                        id="confirmPassword"
+                        type="password"
+                        placeholder="Confirm password"
+                        minlength="6"
+                        required
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <div class="security-box">
+
+                🔒 Your account is protected by
+                SecureGuard's real-time cybersecurity
+                monitoring and alert system.
+
+            </div>
+
+
+            <button
+                type="submit"
+                id="registerButton">
+
+                Create Secure Account
+
+            </button>
+
+
+            <div id="message"></div>
+
+
+        </form>
+
+
+        <div class="links">
+
+            Already have an account?
+
+            <a href="/login.html">
+                Sign in
+            </a>
+
+        </div>
+
+
+        <a
+            href="/"
+            class="back">
+
+            ← Back to Security Dashboard
+
+        </a>
+
+
+    </section>
 
 
 </div>
@@ -195,127 +576,181 @@
 <script>
 
 
-async function registerUser() {
+const password =
+    document.getElementById("password");
 
 
-    const name =
-        document
-        .getElementById("name")
-        .value
-        .trim();
+const confirmPassword =
+    document.getElementById("confirmPassword");
 
 
-    const email =
-        document
-        .getElementById("email")
-        .value
-        .trim();
+const strengthBar =
+    document.getElementById("strengthBar");
 
 
-    const password =
-        document
-        .getElementById("password")
-        .value;
+const message =
+    document.getElementById("message");
 
 
-    const message =
-        document
-        .getElementById("message");
+const registerButton =
+    document.getElementById("registerButton");
 
 
-    if (!name || !email || !password) {
+
+/* PASSWORD STRENGTH */
+
+password.addEventListener("input", function () {
+
+    const value = password.value;
+
+    let score = 0;
+
+    if (value.length >= 6) score++;
+
+    if (/[A-Z]/.test(value)) score++;
+
+    if (/[0-9]/.test(value)) score++;
+
+    if (/[^A-Za-z0-9]/.test(value)) score++;
+
+
+    strengthBar.style.width =
+        (score * 25) + "%";
+
+});
+
+
+
+/* REGISTER */
+
+document
+    .getElementById("registerForm")
+    .addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+
+        const name =
+            document
+                .getElementById("name")
+                .value
+                .trim();
+
+
+        const email =
+            document
+                .getElementById("email")
+                .value
+                .trim();
+
+
+        const passwordValue =
+            password.value;
+
+
+        const confirmValue =
+            confirmPassword.value;
+
+
+        if (passwordValue !== confirmValue) {
+
+            message.textContent =
+                "Passwords do not match.";
+
+            message.style.color =
+                "#dc2626";
+
+            return;
+        }
+
 
         message.textContent =
-            "Please fill all fields.";
+            "Creating secure account...";
 
         message.style.color =
-            "#f87171";
-
-        return;
-    }
+            "#2563eb";
 
 
-    message.textContent =
-        "Creating account...";
-
-    message.style.color =
-        "#facc15";
+        registerButton.disabled = true;
 
 
-    try {
+        try {
+
+            const response =
+                await fetch(
+                    "/api/register",
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            name: name,
+
+                            email: email,
+
+                            password: passwordValue
+
+                        })
+
+                    }
+                );
 
 
-        const response =
-            await fetch(
-                "/api/register",
-                {
-
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-
-                        name: name,
-
-                        email: email,
-
-                        password: password
-
-                    })
-
-                }
-            );
+            const data =
+                await response.json();
 
 
-        const data =
-            await response.json();
+            if (!response.ok) {
 
+                message.textContent =
+                    data.detail ||
+                    "Registration failed.";
 
-        if (response.ok) {
+                message.style.color =
+                    "#dc2626";
+
+                registerButton.disabled = false;
+
+                return;
+            }
 
 
             message.textContent =
                 "Account created successfully!";
 
-
             message.style.color =
-                "#4ade80";
+                "#16a34a";
 
 
-        } else {
+            setTimeout(function () {
 
+                window.location.href =
+                    "/login.html";
+
+            }, 1500);
+
+
+        } catch (error) {
+
+            console.error(error);
 
             message.textContent =
-                data.detail ||
-                "Registration failed.";
-
+                "Unable to connect to SecureGuard.";
 
             message.style.color =
-                "#f87171";
+                "#dc2626";
+
+            registerButton.disabled = false;
 
         }
 
-
-    } catch (error) {
-
-
-        console.error(error);
-
-
-        message.textContent =
-            "Server connection failed.";
-
-
-        message.style.color =
-            "#f87171";
-
-    }
-
-}
+    });
 
 
 </script>
