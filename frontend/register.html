@@ -1,125 +1,326 @@
-    } catch (error) {
-</body>
-</html>}
-</script>
-
-        message.textContent = "Server connection failed.";
-    }
-        }
-
-        } else {
-            message.textContent = data.detail || "Registration failed.";
-
-        if (response.ok) {
-            message.textContent = "Account created successfully!";
 <!DOCTYPE html>
-<html>
-        });
+<html lang="en">
 
-        const data = await response.json();
 <head>
-    <title>SecureGuard - Create Account</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SecureGuard | Register</title>
 
     <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
-                email: email,
-                password: password
-            })
-            font-family: Arial, sans-serif;
-            background: #0f172a;
-            color: white;
+            min-height: 100vh;
+
             display: flex;
             justify-content: center;
-            },
-            body: JSON.stringify({
-                name: name,
             align-items: center;
-            min-height: 100vh;
+
+            font-family: Arial, Helvetica, sans-serif;
+
+            background: #0f172a;
+            color: white;
         }
 
-    try {
-        const response = await fetch("/api/register", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
         .box {
-            width: 360px;
-            padding: 30px;
+            width: 380px;
+
             background: #1e293b;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+
+            padding: 35px;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.3);
         }
-    }
 
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const message = document.getElementById("message");
-
-    if (!name || !email || !password) {
-        message.textContent = "Please fill all fields.";
-        return;
-
-    const name = document.getElementById("name").value;
         h1 {
             text-align: center;
-async function registerUser() {
-
             margin-bottom: 8px;
         }
 
         p {
-<script>
             text-align: center;
             color: #94a3b8;
         }
 
         input {
-
             width: 100%;
-</div>
-            box-sizing: border-box;
+
             padding: 12px;
+
             margin: 8px 0;
 
-    <div id="message"></div>
             border: none;
+
             border-radius: 8px;
+
             background: #334155;
-    <button onclick="registerUser()">Create Account</button>
+
             color: white;
+
+            outline: none;
         }
 
+        input::placeholder {
+            color: #94a3b8;
+        }
 
         button {
             width: 100%;
+
             padding: 12px;
-    <input id="password" type="password" placeholder="Password">
+
             margin-top: 12px;
+
             border: none;
+
             border-radius: 8px;
-            background: #2563eb;
-    <input id="email" type="email" placeholder="Email">
+
+            background: #16a34a;
+
             color: white;
+
             font-size: 16px;
 
-    <input id="name" type="text" placeholder="Full Name">
             cursor: pointer;
         }
 
-    <p>Create your security account</p>
         button:hover {
-            background: #1d4ed8;
-    <h1>SecureGuard</h1>
+            background: #15803d;
         }
-<body>
-
-<div class="box">
-    </style>
-</head>
-
 
         #message {
             margin-top: 15px;
 
+            text-align: center;
+
+            font-size: 14px;
+        }
+
+        .back {
+            display: block;
+
+            text-align: center;
+
+            margin-top: 18px;
+
+            color: #60a5fa;
+
+            text-decoration: none;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="box">
+
+
+    <h1>
+        SecureGuard
+    </h1>
+
+
+    <p>
+        Create your security account
+    </p>
+
+
+    <input
+        id="name"
+        type="text"
+        placeholder="Full Name"
+    >
+
+
+    <input
+        id="email"
+        type="email"
+        placeholder="Email"
+    >
+
+
+    <input
+        id="password"
+        type="password"
+        placeholder="Password"
+    >
+
+
+    <button onclick="registerUser()">
+
+        Create Account
+
+    </button>
+
+
+    <div id="message"></div>
+
+
+    <a
+        class="back"
+        href="/login.html">
+
+        Already have an account? Login
+
+    </a>
+
+
+    <a
+        class="back"
+        href="/">
+
+        ← Back to Dashboard
+
+    </a>
+
+
+</div>
+
+
+<script>
+
+
+async function registerUser() {
+
+
+    const name =
+        document
+        .getElementById("name")
+        .value
+        .trim();
+
+
+    const email =
+        document
+        .getElementById("email")
+        .value
+        .trim();
+
+
+    const password =
+        document
+        .getElementById("password")
+        .value;
+
+
+    const message =
+        document
+        .getElementById("message");
+
+
+    if (!name || !email || !password) {
+
+        message.textContent =
+            "Please fill all fields.";
+
+        message.style.color =
+            "#f87171";
+
+        return;
+    }
+
+
+    message.textContent =
+        "Creating account...";
+
+    message.style.color =
+        "#facc15";
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "/api/register",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        name: name,
+
+                        email: email,
+
+                        password: password
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (response.ok) {
+
+
+            message.textContent =
+                "Account created successfully!";
+
+
+            message.style.color =
+                "#4ade80";
+
+
+        } else {
+
+
+            message.textContent =
+                data.detail ||
+                "Registration failed.";
+
+
+            message.style.color =
+                "#f87171";
+
+        }
+
+
+    } catch (error) {
+
+
+        console.error(error);
+
+
+        message.textContent =
+            "Server connection failed.";
+
+
+        message.style.color =
+            "#f87171";
+
+    }
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>
