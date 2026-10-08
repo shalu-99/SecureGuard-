@@ -32,6 +32,106 @@
             color: #0f172a;
         }
 
+        /* =========================
+           LOADING SCREEN
+        ========================= */
+
+        #loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+
+            background: #0f172a;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            color: white;
+
+            animation: loaderFade 0.7s ease 1.5s forwards;
+        }
+
+        .loader-shield {
+            font-size: 64px;
+            margin-bottom: 12px;
+
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+
+        .loader-title {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .loader-subtitle {
+            margin-top: 6px;
+
+            color: #94a3b8;
+
+            font-size: 11px;
+            letter-spacing: 2px;
+
+            text-align: center;
+        }
+
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+
+            margin-top: 28px;
+
+            border: 4px solid #334155;
+            border-top: 4px solid #2563eb;
+
+            border-radius: 50%;
+
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-text {
+            margin-top: 15px;
+
+            color: #cbd5e1;
+
+            font-size: 13px;
+        }
+
+        @keyframes spin {
+
+            to {
+                transform: rotate(360deg);
+            }
+
+        }
+
+        @keyframes pulse {
+
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.08);
+            }
+
+        }
+
+        @keyframes loaderFade {
+
+            to {
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+            }
+
+        }
+
+        /* =========================
+           MAIN WRAPPER
+        ========================= */
+
         .wrapper {
             width: 100%;
             max-width: 980px;
@@ -49,7 +149,9 @@
                 0 25px 70px rgba(0, 0, 0, 0.35);
         }
 
-        /* LEFT SIDE */
+        /* =========================
+           LEFT PANEL
+        ========================= */
 
         .brand-section {
             background: #0f172a;
@@ -88,11 +190,13 @@
 
         .brand h1 {
             margin: 0;
+
             font-size: 28px;
         }
 
         .brand span {
             display: block;
+
             margin-top: 4px;
 
             color: #94a3b8;
@@ -105,13 +209,15 @@
             margin: 0 0 15px;
 
             font-size: 32px;
+
             line-height: 1.2;
         }
 
-        .brand-section p {
+        .brand-section > p {
             color: #cbd5e1;
 
             font-size: 14px;
+
             line-height: 1.7;
         }
 
@@ -121,6 +227,7 @@
 
         .feature {
             display: flex;
+
             gap: 12px;
 
             margin: 16px 0;
@@ -132,10 +239,13 @@
 
         .tick {
             color: #4ade80;
+
             font-weight: bold;
         }
 
-        /* RIGHT SIDE */
+        /* =========================
+           RIGHT FORM PANEL
+        ========================= */
 
         .form-section {
             padding: 48px 45px;
@@ -210,6 +320,10 @@
             gap: 12px;
         }
 
+        /* =========================
+           PASSWORD STRENGTH
+        ========================= */
+
         .strength {
             height: 5px;
 
@@ -232,6 +346,10 @@
             transition: 0.3s;
         }
 
+        /* =========================
+           SECURITY MESSAGE
+        ========================= */
+
         .security-box {
             margin: 20px 0;
 
@@ -249,6 +367,10 @@
 
             line-height: 1.5;
         }
+
+        /* =========================
+           BUTTON
+        ========================= */
 
         button {
             width: 100%;
@@ -278,8 +400,13 @@
 
         button:disabled {
             opacity: 0.7;
+
             cursor: not-allowed;
         }
+
+        /* =========================
+           MESSAGE
+        ========================= */
 
         #message {
             margin-top: 15px;
@@ -290,6 +417,10 @@
 
             min-height: 18px;
         }
+
+        /* =========================
+           LINKS
+        ========================= */
 
         .links {
             margin-top: 22px;
@@ -307,6 +438,10 @@
             text-decoration: none;
 
             font-weight: bold;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
         }
 
         .back {
@@ -327,6 +462,10 @@
             color: #2563eb;
         }
 
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
         @media (max-width: 800px) {
 
             .wrapper {
@@ -340,6 +479,7 @@
             .form-section {
                 padding: 35px 28px;
             }
+
         }
 
         @media (max-width: 520px) {
@@ -351,6 +491,11 @@
             body {
                 padding: 15px;
             }
+
+            .brand-section h2 {
+                font-size: 26px;
+            }
+
         }
 
     </style>
@@ -361,12 +506,44 @@
 <body>
 
 
+<!-- =========================
+     LOADING SCREEN
+========================= -->
+
+<div id="loader">
+
+    <div class="loader-shield">
+        🛡️
+    </div>
+
+    <div class="loader-title">
+        SecureGuard
+    </div>
+
+    <div class="loader-subtitle">
+        REAL-TIME CYBERSECURITY MONITORING
+    </div>
+
+    <div class="loader-spinner"></div>
+
+    <div class="loader-text">
+        Initializing secure environment...
+    </div>
+
+</div>
+
+
+<!-- =========================
+     MAIN PAGE
+========================= -->
+
 <div class="wrapper">
 
 
-    <!-- LEFT PANEL -->
+    <!-- LEFT -->
 
     <section class="brand-section">
+
 
         <div class="brand">
 
@@ -376,7 +553,9 @@
 
             <div>
 
-                <h1>SecureGuard</h1>
+                <h1>
+                    SecureGuard
+                </h1>
 
                 <span>
                     REAL-TIME CYBERSECURITY MONITORING
@@ -401,38 +580,74 @@
 
         <div class="feature-list">
 
-            <div class="feature">
-                <span class="tick">✓</span>
-                <span>Real-time authentication monitoring</span>
-            </div>
 
             <div class="feature">
-                <span class="tick">✓</span>
-                <span>Suspicious login detection</span>
+
+                <span class="tick">
+                    ✓
+                </span>
+
+                <span>
+                    Real-time authentication monitoring
+                </span>
+
             </div>
 
-            <div class="feature">
-                <span class="tick">✓</span>
-                <span>Security alert notifications</span>
-            </div>
 
             <div class="feature">
-                <span class="tick">✓</span>
-                <span>Secure security-event storage</span>
+
+                <span class="tick">
+                    ✓
+                </span>
+
+                <span>
+                    Suspicious login detection
+                </span>
+
             </div>
+
+
+            <div class="feature">
+
+                <span class="tick">
+                    ✓
+                </span>
+
+                <span>
+                    Security alert notifications
+                </span>
+
+            </div>
+
+
+            <div class="feature">
+
+                <span class="tick">
+                    ✓
+                </span>
+
+                <span>
+                    Secure security-event storage
+                </span>
+
+            </div>
+
 
         </div>
+
 
     </section>
 
 
-    <!-- FORM PANEL -->
+    <!-- RIGHT -->
 
     <section class="form-section">
+
 
         <h2>
             Create Account
         </h2>
+
 
         <p class="subtitle">
             Enter your details to register with SecureGuard.
@@ -441,6 +656,8 @@
 
         <form id="registerForm">
 
+
+            <!-- FULL NAME -->
 
             <div class="field">
 
@@ -458,6 +675,8 @@
             </div>
 
 
+            <!-- EMAIL -->
+
             <div class="field">
 
                 <label for="email">
@@ -474,6 +693,8 @@
             </div>
 
 
+            <!-- PASSWORDS -->
+
             <div class="password-row">
 
 
@@ -486,10 +707,11 @@
                     <input
                         id="password"
                         type="password"
-                        placeholder="Create password"
                         minlength="6"
+                        placeholder="Create password"
                         required
                     >
+
 
                     <div class="strength">
 
@@ -512,8 +734,8 @@
                     <input
                         id="confirmPassword"
                         type="password"
-                        placeholder="Confirm password"
                         minlength="6"
+                        placeholder="Confirm password"
                         required
                     >
 
@@ -523,6 +745,8 @@
             </div>
 
 
+            <!-- SECURITY MESSAGE -->
+
             <div class="security-box">
 
                 🔒 Your account is protected by
@@ -531,6 +755,8 @@
 
             </div>
 
+
+            <!-- BUTTON -->
 
             <button
                 type="submit"
@@ -547,6 +773,8 @@
         </form>
 
 
+        <!-- LOGIN -->
+
         <div class="links">
 
             Already have an account?
@@ -557,6 +785,8 @@
 
         </div>
 
+
+        <!-- DASHBOARD -->
 
         <a
             href="/"
@@ -575,29 +805,25 @@
 
 <script>
 
+/* =========================
+   PASSWORD STRENGTH
+========================= */
 
 const password =
     document.getElementById("password");
 
-
 const confirmPassword =
     document.getElementById("confirmPassword");
-
 
 const strengthBar =
     document.getElementById("strengthBar");
 
-
 const message =
     document.getElementById("message");
-
 
 const registerButton =
     document.getElementById("registerButton");
 
-
-
-/* PASSWORD STRENGTH */
 
 password.addEventListener("input", function () {
 
@@ -605,27 +831,73 @@ password.addEventListener("input", function () {
 
     let score = 0;
 
-    if (value.length >= 6) score++;
 
-    if (/[A-Z]/.test(value)) score++;
+    if (value.length >= 6) {
+        score++;
+    }
 
-    if (/[0-9]/.test(value)) score++;
 
-    if (/[^A-Za-z0-9]/.test(value)) score++;
+    if (/[A-Z]/.test(value)) {
+        score++;
+    }
+
+
+    if (/[0-9]/.test(value)) {
+        score++;
+    }
+
+
+    if (/[^A-Za-z0-9]/.test(value)) {
+        score++;
+    }
 
 
     strengthBar.style.width =
         (score * 25) + "%";
 
+
+    if (score === 0) {
+
+        strengthBar.style.background =
+            "#94a3b8";
+
+    }
+    else if (score === 1) {
+
+        strengthBar.style.background =
+            "#ef4444";
+
+    }
+    else if (score === 2) {
+
+        strengthBar.style.background =
+            "#f59e0b";
+
+    }
+    else if (score === 3) {
+
+        strengthBar.style.background =
+            "#3b82f6";
+
+    }
+    else {
+
+        strengthBar.style.background =
+            "#16a34a";
+
+    }
+
 });
 
 
-
-/* REGISTER */
+/* =========================
+   REGISTER FORM
+========================= */
 
 document
     .getElementById("registerForm")
     .addEventListener("submit", async function (event) {
+
 
         event.preventDefault();
 
@@ -652,6 +924,8 @@ document
             confirmPassword.value;
 
 
+        /* PASSWORD MATCH */
+
         if (passwordValue !== confirmValue) {
 
             message.textContent =
@@ -661,6 +935,22 @@ document
                 "#dc2626";
 
             return;
+
+        }
+
+
+        /* PASSWORD LENGTH */
+
+        if (passwordValue.length < 6) {
+
+            message.textContent =
+                "Password must contain at least 6 characters.";
+
+            message.style.color =
+                "#dc2626";
+
+            return;
+
         }
 
 
@@ -675,6 +965,7 @@ document
 
 
         try {
+
 
             const response =
                 await fetch(
@@ -706,6 +997,8 @@ document
                 await response.json();
 
 
+            /* ERROR */
+
             if (!response.ok) {
 
                 message.textContent =
@@ -715,11 +1008,15 @@ document
                 message.style.color =
                     "#dc2626";
 
-                registerButton.disabled = false;
+                registerButton.disabled =
+                    false;
 
                 return;
+
             }
 
+
+            /* SUCCESS */
 
             message.textContent =
                 "Account created successfully!";
@@ -736,9 +1033,11 @@ document
             }, 1500);
 
 
-        } catch (error) {
+        }
+        catch (error) {
 
             console.error(error);
+
 
             message.textContent =
                 "Unable to connect to SecureGuard.";
@@ -746,12 +1045,31 @@ document
             message.style.color =
                 "#dc2626";
 
-            registerButton.disabled = false;
+
+            registerButton.disabled =
+                false;
 
         }
 
     });
 
+
+/* =========================
+   LOADER
+========================= */
+
+window.addEventListener("load", function () {
+
+    setTimeout(function () {
+
+        const loader =
+            document.getElementById("loader");
+
+        loader.style.display = "none";
+
+    }, 2200);
+
+});
 
 </script>
 
