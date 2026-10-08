@@ -4,9 +4,11 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>SecureGuard</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SecureGuard | Loading</title>
 
     <style>
 
@@ -16,38 +18,75 @@
 
         body {
             margin: 0;
+
             min-height: 100vh;
 
-            background: #0f172a;
-
             display: flex;
+
             align-items: center;
+
             justify-content: center;
 
             font-family: Arial, Helvetica, sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    #1e3a8a 0%,
+                    transparent 35%
+                ),
+                radial-gradient(
+                    circle at bottom right,
+                    #0f766e 0%,
+                    transparent 30%
+                ),
+                #0f172a;
 
             color: white;
         }
 
         .loader {
             text-align: center;
+
+            padding: 30px;
         }
 
         .shield {
-            font-size: 72px;
+            width: 90px;
 
-            margin-bottom: 15px;
+            height: 90px;
 
-            animation: pulse 1.2s ease-in-out infinite;
+            margin: 0 auto 20px;
+
+            border-radius: 24px;
+
+            background: #2563eb;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 52px;
+
+            box-shadow:
+                0 15px 40px rgba(37, 99, 235, 0.35);
+
+            animation: pulse 1.4s ease-in-out infinite;
         }
 
         h1 {
-            margin: 0 0 8px;
+            margin: 0;
 
-            font-size: 36px;
+            font-size: 38px;
+
+            letter-spacing: 0.5px;
         }
 
         .subtitle {
+            margin-top: 8px;
+
             color: #94a3b8;
 
             font-size: 11px;
@@ -56,10 +95,11 @@
         }
 
         .spinner {
-            width: 42px;
-            height: 42px;
+            width: 44px;
 
-            margin: 30px auto 18px;
+            height: 44px;
+
+            margin: 32px auto 18px;
 
             border: 4px solid #334155;
 
@@ -74,6 +114,26 @@
             color: #cbd5e1;
 
             font-size: 13px;
+
+            letter-spacing: 0.3px;
+        }
+
+        .status {
+            margin-top: 22px;
+
+            display: inline-block;
+
+            padding: 7px 13px;
+
+            border: 1px solid #1d4ed8;
+
+            border-radius: 20px;
+
+            background: rgba(37, 99, 235, 0.12);
+
+            color: #bfdbfe;
+
+            font-size: 11px;
         }
 
         @keyframes spin {
@@ -91,7 +151,7 @@
             }
 
             50% {
-                transform: scale(1.08);
+                transform: scale(1.06);
             }
 
         }
@@ -106,23 +166,34 @@
 
 <div class="loader">
 
+
     <div class="shield">
         🛡️
     </div>
+
 
     <h1>
         SecureGuard
     </h1>
 
+
     <div class="subtitle">
         REAL-TIME CYBERSECURITY MONITORING
     </div>
 
+
     <div class="spinner"></div>
+
 
     <div class="loading-text">
         Initializing secure environment...
     </div>
+
+
+    <div class="status">
+        ● SECURE SYSTEM INITIALIZING
+    </div>
+
 
 </div>
 
@@ -131,7 +202,7 @@
 
     setTimeout(function () {
 
-        window.location.href = "/dashboard";
+        window.location.href = "/auth.html";
 
     }, 2200);
 
