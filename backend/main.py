@@ -15,15 +15,24 @@ from backend.email_service import send_security_alert
 app = FastAPI(title="SecureGuard API")
 
 
-# Create database tables
+# =========================================================
+# DATABASE TABLE CREATION
+# =========================================================
+
 Base.metadata.create_all(bind=engine)
 
 
-# Frontend directory
+# =========================================================
+# FRONTEND DIRECTORY
+# =========================================================
+
 FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 
 
-# Serve frontend files
+# =========================================================
+# STATIC FILES
+# =========================================================
+
 app.mount(
     "/frontend",
     StaticFiles(directory=str(FRONTEND_DIR)),
@@ -35,7 +44,8 @@ app.mount(
 # PAGE ROUTES
 # =========================================================
 
-# First page: SecureGuard logo + loading
+# 1st page
+# SecureGuard logo + loading screen
 @app.get("/")
 def home():
     return FileResponse(
@@ -43,7 +53,17 @@ def home():
     )
 
 
-# Second page: Dashboard
+# 2nd page
+# Login / Register selection page
+@app.get("/auth.html")
+def auth_page():
+    return FileResponse(
+        FRONTEND_DIR / "auth.html"
+    )
+
+
+# 3rd page
+# Final Security Operations Dashboard
 @app.get("/dashboard")
 def dashboard():
     return FileResponse(
@@ -68,7 +88,7 @@ def register_page():
 
 
 # =========================================================
-# DATABASE HEALTH
+# DATABASE HEALTH CHECK
 # =========================================================
 
 @app.get("/api/health/db")
@@ -97,7 +117,7 @@ def database_health():
 
 
 # =========================================================
-# REGISTER
+# USER REGISTRATION
 # =========================================================
 
 @app.post("/api/register")
@@ -106,21 +126,28 @@ def register(
     db: Session = Depends(get_db)
 ):
 
-    # Check existing user
+    # Check whether email already exists
     existing_user = (
+
         db.query(models.User)
+
         .filter(
             models.User.email == user_data.email
         )
+
         .first()
+
     )
 
 
     if existing_user:
 
         raise HTTPException(
+
             status_code=400,
+
             detail="Email already registered"
+
         )
 
 
@@ -192,7 +219,7 @@ SecureGuard Security Team
 
 
 # =========================================================
-# LOGIN
+# USER LOGIN
 # =========================================================
 
 @app.post("/api/login")
@@ -203,11 +230,15 @@ def login(
 
     # Find user
     user = (
+
         db.query(models.User)
+
         .filter(
             models.User.email == login_data.email
         )
+
         .first()
+
     )
 
 
@@ -215,17 +246,23 @@ def login(
     if not user:
 
         raise HTTPException(
+
             status_code=401,
+
             detail="Invalid email or password"
+
         )
 
 
-    # Check deactivated account
+    # Check if account is deactivated
     if user.status == "deactivated":
 
         raise HTTPException(
+
             status_code=403,
+
             detail="Account is deactivated"
+
         )
 
 
@@ -234,9 +271,13 @@ def login(
     # =====================================================
 
     if not verify_password(
+
         login_data.password,
+
         user.password_hash
+
     ):
+
 
         failed_attempt = models.LoginAttempt(
 
@@ -254,7 +295,7 @@ def login(
         db.commit()
 
 
-        # Count failed attempts
+        # Count failed login attempts
         failed_count = (
 
             db.query(models.LoginAttempt)
@@ -278,6 +319,7 @@ def login(
 
         if failed_count >= 3:
 
+
             existing_alert = (
 
                 db.query(models.Alert)
@@ -299,6 +341,7 @@ def login(
 
 
             if not existing_alert:
+
 
                 alert = models.Alert(
 
@@ -322,7 +365,7 @@ def login(
                 db.commit()
 
 
-                # Security email
+                # Send security alert email
                 send_security_alert(
 
                     user.email,
@@ -393,7 +436,7 @@ SecureGuard Security Team
 
 
 # =========================================================
-# GET SECURITY ALERTS
+# SECURITY ALERTS
 # =========================================================
 
 @app.get("/api/alerts")
@@ -459,6 +502,7 @@ def deactivate_account(
 
 ):
 
+
     # Find user
     user = (
 
@@ -488,7 +532,10 @@ def deactivate_account(
     user.status = "deactivated"
 
 
-    # Create security event
+    # =====================================================
+    # SECURITY EVENT
+    # =====================================================
+
     event = models.SecurityEvent(
 
         user_id=user.id,
@@ -505,7 +552,10 @@ def deactivate_account(
     )
 
 
-    # Create alert
+    # =====================================================
+    # SECURITY ALERT
+    # =====================================================
+
     alert = models.Alert(
 
         user_id=user.id,
@@ -530,7 +580,10 @@ def deactivate_account(
     db.commit()
 
 
-    # Send security notification
+    # =====================================================
+    # SECURITY EMAIL
+    # =====================================================
+
     email_sent = send_security_alert(
 
         user.email,
