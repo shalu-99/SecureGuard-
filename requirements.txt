@@ -1,7 +1,6 @@
-nano requirements.txtfastapi
+fastapi
 uvicorn
 sqlalchemy
-psycopg2-binary
 psycopg[binary]
 python-dotenv
 pydantic[email]
