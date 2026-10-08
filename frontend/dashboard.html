@@ -1,1100 +1,763 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>SecureGuard | Cybersecurity Monitoring</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #07111f;
-            color: #e5eef9;
-            min-height: 100vh;
-        }
-
-        /* ================= SPLASH SCREEN ================= */
-
-        #splashScreen {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            background:
-                radial-gradient(circle at center, #102b4c 0%, #07111f 55%, #030914 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.6s ease, visibility 0.6s ease;
-        }
-
-        #splashScreen.hide {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .splash-content {
-            text-align: center;
-            animation: splashIn 0.9s ease;
-        }
-
-        .logo-shield {
-            width: 100px;
-            height: 115px;
-            margin: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(145deg, #1683ff, #0754b8);
-            clip-path: polygon(
-                50% 0%,
-                91% 15%,
-                91% 55%,
-                78% 78%,
-                50% 100%,
-                22% 78%,
-                9% 55%,
-                9% 15%
-            );
-            box-shadow: 0 0 45px rgba(30, 144, 255, 0.55);
-        }
-
-        .logo-shield span {
-            font-size: 48px;
-        }
-
-        .splash-content h1 {
-            margin-top: 25px;
-            font-size: 42px;
-            letter-spacing: 2px;
-        }
-
-        .splash-content p {
-            margin-top: 8px;
-            color: #8fb1d3;
-            font-size: 14px;
-            letter-spacing: 1px;
-        }
-
-        .loading-line {
-            width: 220px;
-            height: 3px;
-            margin: 28px auto 0;
-            background: #17304d;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .loading-line::after {
-            content: "";
-            display: block;
-            width: 45%;
-            height: 100%;
-            background: #2d9cff;
-            animation: loading 1.3s infinite ease-in-out;
-        }
-
-        @keyframes loading {
-            0% {
-                transform: translateX(-100%);
-            }
-
-            100% {
-                transform: translateX(330%);
-            }
-        }
-
-        @keyframes splashIn {
-            from {
-                opacity: 0;
-                transform: scale(0.92);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        /* ================= HEADER ================= */
-
-        header {
-            background: #091827;
-            border-bottom: 1px solid #19324d;
-            padding: 18px 35px;
-
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .small-shield {
-            width: 48px;
-            height: 55px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(145deg, #1683ff, #0754b8);
-            clip-path: polygon(
-                50% 0%,
-                91% 15%,
-                91% 55%,
-                78% 78%,
-                50% 100%,
-                22% 78%,
-                9% 55%,
-                9% 15%
-            );
-        }
-
-        .small-shield span {
-            font-size: 23px;
-        }
-
-        .brand h1 {
-            font-size: 24px;
-            letter-spacing: 1px;
-        }
-
-        .brand p {
-            color: #7898b7;
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .nav {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            flex-wrap: wrap;
-        }
-
-        .nav a {
-            text-decoration: none;
-            color: #dcecff;
-            padding: 9px 15px;
-            border: 1px solid #29445f;
-            border-radius: 7px;
-            font-size: 13px;
-            transition: 0.2s;
-        }
-
-        .nav a:hover {
-            background: #12304f;
-            border-color: #318eea;
-        }
-
-        .login-btn {
-            background: #1267c9;
-            border-color: #1267c9 !important;
-        }
-
-        .register-btn {
-            background: #087f5b;
-            border-color: #087f5b !important;
-        }
-
-        /* ================= MAIN ================= */
-
-        .container {
-            max-width: 1350px;
-            margin: auto;
-            padding: 32px;
-        }
-
-        .hero {
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(18, 61, 99, 0.8),
-                    rgba(7, 17, 31, 0.95)
-                );
-            border: 1px solid #1b3c5d;
-            border-radius: 16px;
-            padding: 28px;
-            margin-bottom: 25px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::after {
-            content: "SECURITY";
-            position: absolute;
-            right: 25px;
-            bottom: -10px;
-            font-size: 70px;
-            font-weight: bold;
-            color: rgba(80, 160, 230, 0.04);
-            letter-spacing: 5px;
-        }
-
-        .hero h2 {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-
-        .hero p {
-            color: #91abc4;
-            font-size: 14px;
-            max-width: 720px;
-            line-height: 1.7;
-        }
-
-        .live-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            margin-top: 18px;
-            background: rgba(16, 122, 82, 0.18);
-            border: 1px solid #126e4c;
-            color: #57e3ac;
-            padding: 7px 13px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .live-dot {
-            width: 7px;
-            height: 7px;
-            background: #36e49a;
-            border-radius: 50%;
-            box-shadow: 0 0 9px #36e49a;
-        }
-
-        /* ================= STATS ================= */
-
-        .section-title {
-            margin: 25px 0 14px;
-            font-size: 15px;
-            color: #a9c4df;
-            letter-spacing: 0.5px;
-        }
-
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-        }
-
-        .card {
-            background: #0b1a2b;
-            border: 1px solid #1a344f;
-            border-radius: 13px;
-            padding: 21px;
-            min-height: 145px;
-            transition: 0.25s;
-        }
-
-        .card:hover {
-            transform: translateY(-3px);
-            border-color: #28618e;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .card-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .card-title {
-            color: #7897b5;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-        }
-
-        .card-icon {
-            width: 35px;
-            height: 35px;
-            border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #102942;
-            font-size: 18px;
-        }
-
-        .number {
-            margin-top: 18px;
-            font-size: 31px;
-            font-weight: bold;
-        }
-
-        .blue {
-            color: #48a8ff;
-        }
-
-        .red {
-            color: #ff6570;
-        }
-
-        .green {
-            color: #45dda0;
-        }
-
-        .cyan {
-            color: #48d9e8;
-        }
-
-        /* ================= MONITORING ================= */
-
-        .monitor-grid {
-            display: grid;
-            grid-template-columns: 1.3fr 0.7fr;
-            gap: 18px;
-            margin-top: 18px;
-        }
-
-        .panel {
-            background: #0b1a2b;
-            border: 1px solid #1a344f;
-            border-radius: 13px;
-            overflow: hidden;
-        }
-
-        .panel-header {
-            padding: 18px 20px;
-            border-bottom: 1px solid #1a344f;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .panel-header h3 {
-            font-size: 15px;
-        }
-
-        .panel-header span {
-            color: #6686a4;
-            font-size: 11px;
-        }
-
-        /* ================= ALERTS ================= */
-
-        #alertsContainer {
-            padding: 18px;
-            max-height: 470px;
-            overflow-y: auto;
-        }
-
-        .alert {
-            background: #0e2033;
-            border: 1px solid #274158;
-            border-left: 4px solid #ff4f5e;
-            border-radius: 9px;
-            padding: 15px;
-            margin-bottom: 12px;
-        }
-
-        .alert:last-child {
-            margin-bottom: 0;
-        }
-
-        .alert-title {
-            color: #ff6974;
-            font-size: 13px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .alert p {
-            margin: 8px 0;
-            color: #c0d1e2;
-            font-size: 13px;
-        }
-
-        .alert-info {
-            color: #6686a4;
-            font-size: 11px;
-            line-height: 1.7;
-        }
-
-        .empty,
-        .loading {
-            padding: 35px;
-            text-align: center;
-            color: #6e8aa4;
-            font-size: 13px;
-        }
-
-        /* ================= SECURITY STATUS ================= */
-
-        .security-list {
-            padding: 10px 20px 20px;
-        }
-
-        .security-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 15px 0;
-            border-bottom: 1px solid #172d43;
-        }
-
-        .security-item:last-child {
-            border-bottom: none;
-        }
-
-        .status-icon {
-            width: 34px;
-            height: 34px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 8px;
-            background: #102942;
-        }
-
-        .security-item strong {
-            display: block;
-            font-size: 13px;
-            margin-bottom: 3px;
-        }
-
-        .security-item small {
-            color: #6686a4;
-            font-size: 11px;
-        }
-
-        .status-ok {
-            margin-left: auto;
-            color: #45dda0;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        /* ================= FOOTER ================= */
-
-        footer {
-            text-align: center;
-            color: #506c87;
-            padding: 30px;
-            font-size: 11px;
-            line-height: 1.7;
-        }
-
-        /* ================= RESPONSIVE ================= */
-
-        @media (max-width: 1000px) {
-            .cards {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .monitor-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 650px) {
-            header {
-                padding: 16px 20px;
-            }
-
-            .container {
-                padding: 20px;
-            }
-
-            .cards {
-                grid-template-columns: 1fr;
-            }
-
-            .hero h2 {
-                font-size: 22px;
-            }
-
-            .nav {
-                width: 100%;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecureGuard | Security Operations Center</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI,Arial,sans-serif;
+}
+
+body{
+    background:#07111f;
+    color:#e8f1ff;
+    min-height:100vh;
+}
+
+/* SPLASH SCREEN */
+#splash{
+    position:fixed;
+    inset:0;
+    background:linear-gradient(135deg,#050b16,#0b1d35);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    z-index:9999;
+    animation:fadeOut 1s ease 2.2s forwards;
+}
+
+.logo{
+    width:90px;
+    height:90px;
+    border:2px solid #39d9ff;
+    border-radius:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 0 35px #159ac0;
+    margin-bottom:20px;
+}
+
+.logo svg{
+    width:55px;
+    height:55px;
+}
+
+.splash-title{
+    font-size:30px;
+    font-weight:700;
+    letter-spacing:2px;
+}
+
+.splash-sub{
+    color:#7fa9c9;
+    margin-top:8px;
+    font-size:13px;
+    letter-spacing:1px;
+}
+
+.loader{
+    width:220px;
+    height:4px;
+    background:#142b42;
+    border-radius:10px;
+    margin-top:25px;
+    overflow:hidden;
+}
+
+.loader span{
+    display:block;
+    height:100%;
+    width:0;
+    background:#39d9ff;
+    animation:load 2s ease forwards;
+}
+
+@keyframes load{
+    to{width:100%}
+}
+
+@keyframes fadeOut{
+    to{
+        opacity:0;
+        visibility:hidden;
+    }
+}
+
+/* HEADER */
+header{
+    height:75px;
+    background:#0a1728;
+    border-bottom:1px solid #18334d;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 35px;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.brand-logo{
+    width:42px;
+    height:42px;
+    border:1px solid #39d9ff;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.brand-logo svg{
+    width:28px;
+    height:28px;
+}
+
+.brand h1{
+    font-size:21px;
+}
+
+.brand small{
+    display:block;
+    color:#7190aa;
+    font-size:10px;
+    letter-spacing:1.5px;
+    margin-top:2px;
+}
+
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.status{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#79e6a4;
+    font-size:13px;
+}
+
+.dot{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#43e27c;
+    box-shadow:0 0 10px #43e27c;
+}
+
+.btn{
+    text-decoration:none;
+    color:#dceeff;
+    border:1px solid #24445f;
+    padding:9px 15px;
+    border-radius:8px;
+    font-size:13px;
+    transition:.2s;
+}
+
+.btn:hover{
+    border-color:#39d9ff;
+    background:#102a40;
+}
+
+/* MAIN */
+main{
+    padding:30px 35px;
+    max-width:1450px;
+    margin:auto;
+}
+
+.hero{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:28px;
+}
+
+.hero h2{
+    font-size:28px;
+    margin-bottom:7px;
+}
+
+.hero p{
+    color:#7895ae;
+    font-size:14px;
+}
+
+.live{
+    border:1px solid #20445c;
+    padding:11px 16px;
+    border-radius:9px;
+    background:#0a1a2b;
+    color:#83c9e5;
+    font-size:12px;
+}
+
+/* STAT CARDS */
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:25px;
+}
+
+.card{
+    background:linear-gradient(145deg,#0c1c2e,#091522);
+    border:1px solid #19364e;
+    border-radius:14px;
+    padding:21px;
+    box-shadow:0 8px 25px rgba(0,0,0,.15);
+}
+
+.stat-label{
+    color:#7190aa;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.stat-value{
+    font-size:31px;
+    font-weight:700;
+    margin-top:10px;
+}
+
+.stat-info{
+    color:#5e7c95;
+    font-size:11px;
+    margin-top:7px;
+}
+
+/* GRID */
+.grid{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px;
+}
+
+.panel{
+    background:#0a1727;
+    border:1px solid #19364e;
+    border-radius:14px;
+    overflow:hidden;
+}
+
+.panel-head{
+    padding:18px 20px;
+    border-bottom:1px solid #18334b;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.panel-head h3{
+    font-size:15px;
+}
+
+.panel-head span{
+    color:#66849d;
+    font-size:11px;
+}
+
+.alert-list{
+    padding:8px 20px 15px;
+}
+
+.alert{
+    display:grid;
+    grid-template-columns:10px 1fr auto;
+    gap:13px;
+    align-items:center;
+    padding:17px 0;
+    border-bottom:1px solid #122b40;
+}
+
+.alert:last-child{
+    border-bottom:none;
+}
+
+.alert-dot{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#f05454;
+    box-shadow:0 0 10px #f05454;
+}
+
+.alert h4{
+    font-size:13px;
+    margin-bottom:4px;
+}
+
+.alert p{
+    color:#6f8ca5;
+    font-size:11px;
+}
+
+.badge{
+    padding:5px 9px;
+    border-radius:5px;
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.7px;
+    background:#341d25;
+    color:#ff7272;
+}
+
+.empty{
+    padding:30px 5px;
+    text-align:center;
+    color:#66849d;
+    font-size:13px;
+}
+
+/* SERVICES */
+.services{
+    padding:18px;
+}
+
+.service{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:14px 0;
+    border-bottom:1px solid #142d42;
+}
+
+.service:last-child{
+    border-bottom:none;
+}
+
+.service-icon{
+    width:34px;
+    height:34px;
+    border-radius:9px;
+    background:#102a40;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#39d9ff;
+    font-size:15px;
+}
+
+.service-info{
+    flex:1;
+}
+
+.service-info strong{
+    display:block;
+    font-size:12px;
+}
+
+.service-info small{
+    color:#617e97;
+    font-size:10px;
+}
+
+.service-status{
+    color:#70df9a;
+    font-size:10px;
+}
+
+/* ACTIVITY */
+.activity{
+    margin-top:20px;
+}
+
+.activity-box{
+    padding:20px;
+}
+
+.activity-line{
+    height:7px;
+    background:#13283c;
+    border-radius:20px;
+    overflow:hidden;
+    margin:13px 0 20px;
+}
+
+.activity-line span{
+    display:block;
+    height:100%;
+    width:68%;
+    background:#39d9ff;
+    border-radius:20px;
+}
+
+.activity-row{
+    display:flex;
+    justify-content:space-between;
+    color:#7593ab;
+    font-size:11px;
+}
+
+/* FOOTER */
+footer{
+    text-align:center;
+    padding:25px;
+    color:#49677f;
+    font-size:10px;
+}
+
+/* RESPONSIVE */
+@media(max-width:1000px){
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:600px){
+    header{
+        padding:0 15px;
+    }
+
+    .header-right .btn{
+        display:none;
+    }
+
+    main{
+        padding:20px 15px;
+    }
+
+    .hero{
+        align-items:flex-start;
+        gap:15px;
+        flex-direction:column;
+    }
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+}
+</style>
 </head>
 
 <body>
 
-    <!-- ================= SPLASH SCREEN ================= -->
-
-    <div id="splashScreen">
-        <div class="splash-content">
-
-            <div class="logo-shield">
-                <span>🛡️</span>
-            </div>
-
-            <h1>SecureGuard</h1>
-
-            <p>REAL-TIME CYBERSECURITY MONITORING</p>
-
-            <div class="loading-line"></div>
-
-        </div>
+<!-- SPLASH -->
+<div id="splash">
+    <div class="logo">
+        <svg viewBox="0 0 100 100" fill="none">
+            <path d="M50 8L82 20V45C82 67 68 84 50 92C32 84 18 67 18 45V20L50 8Z"
+                  stroke="#39d9ff" stroke-width="6"/>
+            <path d="M35 50L45 60L67 36"
+                  stroke="#39d9ff" stroke-width="6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"/>
+        </svg>
     </div>
 
+    <div class="splash-title">SECUREGUARD</div>
+    <div class="splash-sub">REAL-TIME CYBERSECURITY MONITORING</div>
 
-    <!-- ================= HEADER ================= -->
+    <div class="loader">
+        <span></span>
+    </div>
+</div>
 
-    <header>
+<!-- HEADER -->
+<header>
 
-        <div class="brand">
+    <div class="brand">
 
-            <div class="small-shield">
-                <span>🛡️</span>
-            </div>
-
-            <div>
-                <h1>SecureGuard</h1>
-                <p>Cybersecurity Monitoring & Threat Detection System</p>
-            </div>
-
+        <div class="brand-logo">
+            <svg viewBox="0 0 100 100" fill="none">
+                <path d="M50 8L82 20V45C82 67 68 84 50 92C32 84 18 67 18 45V20L50 8Z"
+                      stroke="#39d9ff" stroke-width="7"/>
+                <path d="M35 50L45 60L67 36"
+                      stroke="#39d9ff"
+                      stroke-width="7"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"/>
+            </svg>
         </div>
 
+        <div>
+            <h1>SecureGuard</h1>
+            <small>SECURITY OPERATIONS CENTER</small>
+        </div>
 
-        <nav class="nav">
+    </div>
 
-            <a href="/">Dashboard</a>
+    <div class="header-right">
 
-            <a href="/login.html" class="login-btn">
-                🔐 Login
-            </a>
+        <div class="status">
+            <span class="dot"></span>
+            SYSTEM ONLINE
+        </div>
 
-            <a href="/register.html" class="register-btn">
-                👤 Register
-            </a>
+        <a href="/login.html" class="btn">Login</a>
+        <a href="/register.html" class="btn">Register</a>
 
-        </nav>
+    </div>
 
-    </header>
+</header>
 
+<!-- MAIN -->
+<main>
 
-    <!-- ================= MAIN ================= -->
+    <section class="hero">
 
-    <main class="container">
-
-
-        <!-- HERO -->
-
-        <section class="hero">
-
+        <div>
             <h2>Security Operations Dashboard</h2>
-
-            <p>
-                Monitor account activity, detect suspicious behaviour,
-                analyse security events and receive real-time cybersecurity
-                alerts through the SecureGuard monitoring platform.
-            </p>
-
-            <div class="live-badge">
-                <span class="live-dot"></span>
-                SYSTEM ONLINE — LIVE MONITORING ACTIVE
-            </div>
-
-        </section>
-
-
-        <!-- STATISTICS -->
-
-        <div class="section-title">
-            SECURITY OVERVIEW
+            <p>Real-time monitoring of authentication and security events.</p>
         </div>
 
-        <section class="cards">
-
-
-            <div class="card">
-
-                <div class="card-head">
-
-                    <span class="card-title">
-                        Total Alerts
-                    </span>
-
-                    <div class="card-icon">
-                        🚨
-                    </div>
-
-                </div>
-
-                <div
-                    class="number blue"
-                    id="alertCount">
-                    0
-                </div>
-
-            </div>
-
-
-            <div class="card">
-
-                <div class="card-head">
-
-                    <span class="card-title">
-                        High Severity
-                    </span>
-
-                    <div class="card-icon">
-                        🔴
-                    </div>
-
-                </div>
-
-                <div
-                    class="number red"
-                    id="highCount">
-                    0
-                </div>
-
-            </div>
-
-
-            <div class="card">
-
-                <div class="card-head">
-
-                    <span class="card-title">
-                        System Status
-                    </span>
-
-                    <div class="card-icon">
-                        🟢
-                    </div>
-
-                </div>
-
-                <div class="number green">
-                    ONLINE
-                </div>
-
-            </div>
-
-
-            <div class="card">
-
-                <div class="card-head">
-
-                    <span class="card-title">
-                        Live Monitoring
-                    </span>
-
-                    <div class="card-icon">
-                        📡
-                    </div>
-
-                </div>
-
-                <div class="number cyan">
-                    ACTIVE
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- MONITORING AREA -->
-
-        <div class="section-title">
-            REAL-TIME SECURITY MONITORING
+        <div class="live">
+            ● LIVE MONITORING
         </div>
 
-        <section class="monitor-grid">
+    </section>
 
+    <!-- STATISTICS -->
+    <section class="stats">
 
-            <!-- ALERT PANEL -->
+        <div class="card">
+            <div class="stat-label">Total Security Alerts</div>
+            <div class="stat-value" id="totalAlerts">0</div>
+            <div class="stat-info">Events detected by SecureGuard</div>
+        </div>
 
-            <div class="panel">
+        <div class="card">
+            <div class="stat-label">High Severity</div>
+            <div class="stat-value" id="highAlerts">0</div>
+            <div class="stat-info">Priority security incidents</div>
+        </div>
 
-                <div class="panel-header">
+        <div class="card">
+            <div class="stat-label">Authentication</div>
+            <div class="stat-value">ACTIVE</div>
+            <div class="stat-info">Login monitoring enabled</div>
+        </div>
 
-                    <h3>
-                        🚨 Recent Security Alerts
-                    </h3>
+        <div class="card">
+            <div class="stat-label">System Status</div>
+            <div class="stat-value">ONLINE</div>
+            <div class="stat-info">API monitoring operational</div>
+        </div>
 
-                    <span>
-                        Auto refresh: 5 sec
-                    </span>
+    </section>
 
+    <!-- MAIN GRID -->
+    <section class="grid">
+
+        <!-- ALERTS -->
+        <div class="panel">
+
+            <div class="panel-head">
+                <h3>Recent Security Alerts</h3>
+                <span>LIVE • AUTO REFRESH 5s</span>
+            </div>
+
+            <div class="alert-list" id="alertList">
+                <div class="empty">Loading security events...</div>
+            </div>
+
+        </div>
+
+        <!-- SERVICES -->
+        <div class="panel">
+
+            <div class="panel-head">
+                <h3>Security Services</h3>
+                <span>STATUS</span>
+            </div>
+
+            <div class="services">
+
+                <div class="service">
+                    <div class="service-icon">◉</div>
+                    <div class="service-info">
+                        <strong>Authentication Monitor</strong>
+                        <small>Login activity detection</small>
+                    </div>
+                    <div class="service-status">ONLINE</div>
                 </div>
 
-
-                <div id="alertsContainer">
-
-                    <div class="loading">
-                        Loading security alerts...
+                <div class="service">
+                    <div class="service-icon">◆</div>
+                    <div class="service-info">
+                        <strong>Threat Detection</strong>
+                        <small>Suspicious activity analysis</small>
                     </div>
+                    <div class="service-status">ONLINE</div>
+                </div>
 
+                <div class="service">
+                    <div class="service-icon">▣</div>
+                    <div class="service-info">
+                        <strong>Database</strong>
+                        <small>Security event storage</small>
+                    </div>
+                    <div class="service-status">ONLINE</div>
+                </div>
+
+                <div class="service">
+                    <div class="service-icon">✉</div>
+                    <div class="service-info">
+                        <strong>Email Notifications</strong>
+                        <small>Security alert delivery</small>
+                    </div>
+                    <div class="service-status">ACTIVE</div>
+                </div>
+
+                <div class="service">
+                    <div class="service-icon">API</div>
+                    <div class="service-info">
+                        <strong>FastAPI Backend</strong>
+                        <small>SecureGuard API services</small>
+                    </div>
+                    <div class="service-status">ONLINE</div>
                 </div>
 
             </div>
 
+        </div>
 
-            <!-- SECURITY STATUS -->
+    </section>
 
-            <div class="panel">
+    <!-- ACTIVITY -->
+    <section class="panel activity">
 
-                <div class="panel-header">
+        <div class="panel-head">
+            <h3>Security Activity Monitor</h3>
+            <span>LIVE SYSTEM VIEW</span>
+        </div>
 
-                    <h3>
-                        🛡️ Security Services
-                    </h3>
+        <div class="activity-box">
 
-                    <span>
-                        SYSTEM CHECK
-                    </span>
-
-                </div>
-
-
-                <div class="security-list">
-
-
-                    <div class="security-item">
-
-                        <div class="status-icon">
-                            🔐
-                        </div>
-
-                        <div>
-                            <strong>Authentication</strong>
-                            <small>Login monitoring active</small>
-                        </div>
-
-                        <span class="status-ok">
-                            ACTIVE
-                        </span>
-
-                    </div>
-
-
-                    <div class="security-item">
-
-                        <div class="status-icon">
-                            🚨
-                        </div>
-
-                        <div>
-                            <strong>Threat Detection</strong>
-                            <small>Suspicious activity detection</small>
-                        </div>
-
-                        <span class="status-ok">
-                            ACTIVE
-                        </span>
-
-                    </div>
-
-
-                    <div class="security-item">
-
-                        <div class="status-icon">
-                            🗄️
-                        </div>
-
-                        <div>
-                            <strong>Database</strong>
-                            <small>Security event storage</small>
-                        </div>
-
-                        <span class="status-ok">
-                            ONLINE
-                        </span>
-
-                    </div>
-
-
-                    <div class="security-item">
-
-                        <div class="status-icon">
-                            📧
-                        </div>
-
-                        <div>
-                            <strong>Email Alerts</strong>
-                            <small>Security notification service</small>
-                        </div>
-
-                        <span class="status-ok">
-                            READY
-                        </span>
-
-                    </div>
-
-
-                    <div class="security-item">
-
-                        <div class="status-icon">
-                            📡
-                        </div>
-
-                        <div>
-                            <strong>Live Monitoring</strong>
-                            <small>Real-time dashboard updates</small>
-                        </div>
-
-                        <span class="status-ok">
-                            ACTIVE
-                        </span>
-
-                    </div>
-
-
-                </div>
-
+            <div class="activity-row">
+                <span>Monitoring Engine</span>
+                <span>ACTIVE</span>
             </div>
 
-        </section>
+            <div class="activity-line">
+                <span></span>
+            </div>
 
-    </main>
+            <div class="activity-row">
+                <span>API → Database → Security Layer</span>
+                <span>CONNECTED</span>
+            </div>
 
+        </div>
 
-    <!-- ================= FOOTER ================= -->
+    </section>
 
-    <footer>
+</main>
 
-        <strong>SecureGuard Cybersecurity Monitoring System</strong>
-        <br>
+<footer>
+    SecureGuard • Real-Time Cybersecurity Monitoring & Alert System
+</footer>
 
-        Real-Time Threat Detection • Security Events • Alert Management
 
-        <br><br>
+<script>
 
-        Secure monitoring dashboard for cybersecurity analysis
+async function loadAlerts(){
 
-    </footer>
+    try{
 
+        const response = await fetch("/api/alerts");
 
-    <!-- ================= JAVASCRIPT ================= -->
-
-    <script>
-
-        /* ================= SPLASH ================= */
-
-        window.addEventListener("load", function () {
-
-            setTimeout(function () {
-
-                document
-                    .getElementById("splashScreen")
-                    .classList.add("hide");
-
-            }, 1600);
-
-        });
-
-
-        /* ================= LOAD ALERTS ================= */
-
-        async function loadAlerts() {
-
-            const container =
-                document.getElementById("alertsContainer");
-
-            try {
-
-                const response =
-                    await fetch("/api/alerts");
-
-                if (!response.ok) {
-                    throw new Error("API request failed");
-                }
-
-                const alerts =
-                    await response.json();
-
-
-                /* TOTAL ALERTS */
-
-                document.getElementById(
-                    "alertCount"
-                ).textContent = alerts.length;
-
-
-                /* HIGH SEVERITY */
-
-                const highAlerts =
-                    alerts.filter(function (alert) {
-
-                        return alert.severity &&
-                            alert.severity.toLowerCase()
-                            === "high";
-
-                    });
-
-
-                document.getElementById(
-                    "highCount"
-                ).textContent = highAlerts.length;
-
-
-                /* NO ALERTS */
-
-                if (alerts.length === 0) {
-
-                    container.innerHTML = `
-
-                        <div class="empty">
-
-                            🛡️
-
-                            <br><br>
-
-                            No security alerts detected.
-
-                            <br><br>
-
-                            <small>
-                                System is operating normally.
-                            </small>
-
-                        </div>
-
-                    `;
-
-                    return;
-                }
-
-
-                /* DISPLAY ALERTS */
-
-                container.innerHTML = "";
-
-
-                alerts.forEach(function (alert) {
-
-                    const div =
-                        document.createElement("div");
-
-                    div.className = "alert";
-
-
-                    const severity =
-                        (
-                            alert.severity ||
-                            "unknown"
-                        ).toUpperCase();
-
-
-                    const eventType =
-                        (
-                            alert.event_type ||
-                            "security_event"
-                        )
-                        .replaceAll("_", " ")
-                        .toUpperCase();
-
-
-                    const createdTime =
-                        alert.created_at
-                            ? new Date(
-                                alert.created_at
-                            ).toLocaleString()
-                            : "N/A";
-
-
-                    div.innerHTML = `
-
-                        <div class="alert-title">
-
-                            🔴 ${severity}
-                            — ${eventType}
-
-                        </div>
-
-                        <p>
-
-                            ${
-                                alert.message ||
-                                "Security event detected"
-                            }
-
-                        </p>
-
-                        <div class="alert-info">
-
-                            👤 User ID:
-                            ${alert.user_id ?? "N/A"}
-
-                            <br>
-
-                            📌 Status:
-                            ${alert.status || "N/A"}
-
-                            <br>
-
-                            🕒 Time:
-                            ${createdTime}
-
-                        </div>
-
-                    `;
-
-
-                    container.appendChild(div);
-
-                });
-
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "Error loading alerts:",
-                    error
-                );
-
-
-                container.innerHTML = `
-
-                    <div class="empty">
-
-                        ⚠️ Unable to load security alerts.
-
-                        <br><br>
-
-                        <small>
-                            Please make sure the SecureGuard
-                            backend is running.
-                        </small>
-
-                    </div>
-
-                `;
-
-            }
-
+        if(!response.ok){
+            throw new Error("Unable to load alerts");
         }
 
+        const alerts = await response.json();
 
-        /* ================= INITIAL LOAD ================= */
+        const list = document.getElementById("alertList");
 
-        loadAlerts();
+        document.getElementById("totalAlerts").textContent = alerts.length;
 
+        const highCount = alerts.filter(
+            alert => String(alert.severity).toLowerCase() === "high"
+        ).length;
 
-        /* ================= AUTO REFRESH ================= */
+        document.getElementById("highAlerts").textContent = highCount;
 
-        setInterval(
-            loadAlerts,
-            5000
-        );
+        if(alerts.length === 0){
 
-    </script>
+            list.innerHTML = `
+                <div class="empty">
+                    No security alerts detected.
+                </div>
+            `;
+
+            return;
+        }
+
+        list.innerHTML = alerts.slice(0,10).map(alert => {
+
+            const severity =
+                String(alert.severity || "medium").toUpperCase();
+
+            const message =
+                alert.message || "Security event detected";
+
+            const user =
+                alert.user_id ? "User ID " + alert.user_id : "System";
+
+            const time =
+                alert.created_at
+                ? new Date(alert.created_at).toLocaleString()
+                : "Recent";
+
+            return `
+                <div class="alert">
+
+                    <div class="alert-dot"></div>
+
+                    <div>
+                        <h4>${message}</h4>
+                        <p>
+                            ${user} • ${time}
+                        </p>
+                    </div>
+
+                    <div class="badge">
+                        ${severity}
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        document.getElementById("alertList").innerHTML = `
+            <div class="empty">
+                Unable to connect to security API.
+            </div>
+        `;
+
+    }
+
+}
+
+loadAlerts();
+
+setInterval(loadAlerts,5000);
+
+</script>
 
 </body>
-
 </html>
