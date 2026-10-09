@@ -1,101 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureGuard Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 20px 30px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        .container {
+            padding: 30px;
+        }
+
+        .cards {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            min-width: 200px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        .card h3 {
+            margin-top: 0;
+        }
+
+        .number {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .alerts {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        .alert {
+            border-left: 5px solid #dc2626;
+            padding: 15px;
+            margin-bottom: 12px;
+            background: #fef2f2;
+            border-radius: 6px;
+        }
+
+        .alert strong {
+            color: #b91c1c;
+        }
+
+        .status {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🛡️ SecureGuard</h1>
+    <p>Real-Time Cybersecurity Monitoring Dashboard</p>
+</header>
+
+<div class="container">
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>Security Alerts</h3>
+            <div class="number" id="alertCount">0</div>
+        </div>
+
+        <div class="card">
+            <h3>System Status</h3>
+            <div class="status">ONLINE</div>
+        </div>
+
+        <div class="card">
+            <h3>High Severity</h3>
+            <div class="number" id="highCount">0</div>
+        </div>
+
+    </div>
+
+    <div class="alerts">
+        <h2>Recent Security Alerts</h2>
+
+        <div id="alertsContainer">
+            Loading alerts...
+        </div>
+    </div>
+
+</div>
 
 <script>
-async function loadAlerts() {
-    const list = document.getElementById("alertList");
-    const totalAlerts = document.getElementById("totalAlerts");
-    const highAlerts = document.getElementById("highAlerts");
 
-    if (!list || !totalAlerts || !highAlerts) {
-        console.error("Dashboard elements are missing.");
-        return;
-    }
+async function loadAlerts() {
 
     try {
-        const response = await fetch("/api/alerts", {
-            method: "GET",
-            headers: {
-                "Accept": "application/json"
-            },
-            cache: "no-store"
-        });
 
-        if (!response.ok) {
-            throw new Error("Unable to load alerts");
-        }
+        const response = await fetch(
+            "/api/alerts"
+        );
 
         const alerts = await response.json();
 
-        if (!Array.isArray(alerts)) {
-            throw new Error("Invalid alerts response");
-        }
+        document.getElementById("alertCount").textContent =
+            alerts.length;
 
-        totalAlerts.textContent = String(alerts.length);
+        const highAlerts = alerts.filter(
+            alert => alert.severity === "high"
+        );
 
-        const highCount = alerts.filter(
-            alert =>
-                String(alert.severity || "").toLowerCase() === "high"
-        ).length;
+        document.getElementById("highCount").textContent =
+            highAlerts.length;
 
-        highAlerts.textContent = String(highCount);
+        const container =
+            document.getElementById("alertsContainer");
 
-        // Clear old alert elements safely.
-        list.replaceChildren();
+        container.innerHTML = "";
 
-        if (alerts.length === 0) {
-            const empty = document.createElement("div");
-            empty.className = "empty";
-            empty.textContent = "No security alerts detected.";
-            list.appendChild(empty);
-            return;
-        }
+        alerts.forEach(alert => {
 
-        alerts.slice(0, 10).forEach(alert => {
-            const item = document.createElement("div");
-            item.className = "alert";
+            const div = document.createElement("div");
 
-            const dot = document.createElement("div");
-            dot.className = "alert-dot";
+            div.className = "alert";
 
-            const details = document.createElement("div");
+            div.innerHTML = `
+                <strong>${alert.severity.toUpperCase()} -
+                ${alert.event_type}</strong>
 
-            const heading = document.createElement("h4");
-            heading.textContent =
-                String(alert.message || "Security event detected");
+                <p>${alert.message}</p>
 
-            const description = document.createElement("p");
+                <small>
+                    User ID: ${alert.user_id}
+                    <br>
+                    Status: ${alert.status}
+                    <br>
+                    Time: ${alert.created_at}
+                </small>
+            `;
 
-            const user = alert.user_id
-                ? "User ID " + String(alert.user_id)
-                : "System";
-
-            const time = alert.created_at
-                ? new Date(alert.created_at).toLocaleString()
-                : "Recent";
-
-            description.textContent = user + " • " + time;
-
-            const badge = document.createElement("div");
-            badge.className = "badge";
-            badge.textContent =
-                String(alert.severity || "medium").toUpperCase();
-
-            details.append(heading, description);
-            item.append(dot, details, badge);
-            list.appendChild(item);
+            container.appendChild(div);
         });
+
     } catch (error) {
-        console.error("Dashboard alert error:", error);
 
-        list.replaceChildren();
+        document.getElementById("alertsContainer").innerHTML =
+            "Unable to load security alerts.";
 
-        const message = document.createElement("div");
-        message.className = "empty";
-        message.textContent = "Unable to connect to security API.";
-
-        list.appendChild(message);
+        console.error(error);
     }
 }
 
 loadAlerts();
-setInterval(loadAlerts, 5000);
+
 </script>
+
+</body>
+</html>
