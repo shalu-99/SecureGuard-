@@ -8,7 +8,7 @@ from pathlib import Path
 from backend.database import engine, Base, get_db
 from backend import models
 from backend.schemas import RegisterRequest, LoginRequest
-from backend.auth import hash_password, verify_password
+from backend.auth import hash_password, verify_password, needs_rehash
 from backend.email_service import send_security_alert
 
 
@@ -398,6 +398,11 @@ SecureGuard Security Team
     # =====================================================
     # SUCCESSFUL LOGIN
     # =====================================================
+
+    # Upgrade legacy SHA-256 hashes after successful verification
+    if needs_rehash(user.password_hash):
+        user.password_hash = hash_password(login_data.password)
+        db.commit()
 
     successful_attempt = models.LoginAttempt(
 
