@@ -1,4 +1,7 @@
-from fastapi import FastAPI, Depends, HTTPException
+import os
+import jwt
+from datetime import datetime, timedelta, timezone
+from fastapi import FastAPI, Depends, HTTPException, Header
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from sqlalchemy import text
@@ -14,10 +17,46 @@ from backend.email_service import send_security_alert
 
 app = FastAPI(title="SecureGuard API")
 
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+if not JWT_SECRET_KEY or JWT_SECRET_KEY == "PASTE_YOUR_GENERATED_SECRET_HERE":
+    raise RuntimeError("JWT_SECRET_KEY missing from .env")
+JWT_ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+
 
 # =========================================================
 # DATABASE TABLE CREATION
 # =========================================================
+
+def create_access_token(user_id: int, email: str):
+    now = datetime.now(timezone.utc)
+    payload = {
+        "sub": str(user_id),
+        "email": email,
+        "iat": now,
+        "exp": now + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+    }
+    return jwt.encode(payload, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+
+
+def get_current_user(
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_db)
+):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Authentication required")
+    token = authorization.split(" ", 1)[1]
+    try:
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        user_id = int(payload["sub"])
+    except (jwt.InvalidTokenError, KeyError, ValueError, TypeError):
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user or user.status == "deactivated":
+        raise HTTPException(status_code=401, detail="User unavailable")
+    return user
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -420,24 +459,44 @@ SecureGuard Security Team
     db.commit()
 
 
+    access_token = create_access_token(user.id, user.email)
+
     return {
-
-        "message":
-            "Login successful",
-
-        "user_id":
-            user.id,
-
-        "name":
-            user.name,
-
-        "email":
-            user.email,
-
-        "status":
-            user.status
-
+        "message": "Login successful",
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_id": user.id,
+        "name": user.name,
+        "email": user.email,
+        "status": user.status
     }
+
+
+# =========================================================
+# AUTHENTICATED LOGIN HISTORY
+# =========================================================
+
+@app.get("/api/login-history")
+def get_login_history(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    attempts = (
+        db.query(models.LoginAttempt)
+        .filter(models.LoginAttempt.user_id == current_user.id)
+        .order_by(models.LoginAttempt.timestamp.desc())
+        .limit(50)
+        .all()
+    )
+    return [
+        {
+            "timestamp": attempt.timestamp,
+            "success": attempt.success,
+            "status": "Success" if attempt.success else "Failed",
+            "ip_address": attempt.ip_address,
+        }
+        for attempt in attempts
+    ]
 
 
 # =========================================================
@@ -446,51 +505,27 @@ SecureGuard Security Team
 
 @app.get("/api/alerts")
 def get_alerts(
+    current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-
     alerts = (
-
         db.query(models.Alert)
-
-        .order_by(
-            models.Alert.created_at.desc()
-        )
-
+        .filter(models.Alert.user_id == current_user.id)
+        .order_by(models.Alert.created_at.desc())
         .all()
-
     )
 
-
     return [
-
         {
-
-            "id":
-                alert.id,
-
-            "user_id":
-                alert.user_id,
-
-            "event_type":
-                alert.event_type,
-
-            "severity":
-                alert.severity,
-
-            "message":
-                alert.message,
-
-            "status":
-                alert.status,
-
-            "created_at":
-                alert.created_at
-
+            "id": alert.id,
+            "user_id": alert.user_id,
+            "event_type": alert.event_type,
+            "severity": alert.severity,
+            "message": alert.message,
+            "status": alert.status,
+            "created_at": alert.created_at
         }
-
         for alert in alerts
-
     ]
 
 
@@ -500,44 +535,39 @@ def get_alerts(
 
 @app.post("/api/account/deactivate/{user_id}")
 def deactivate_account(
-
     user_id: int,
-
+    current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
-
 ):
-
-
-    # Find user
-    user = (
-
-        db.query(models.User)
-
-        .filter(
-            models.User.id == user_id
+    # Users may deactivate only their own account.
+    if current_user.id != user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="You can only deactivate your own account"
         )
 
+    user = (
+        db.query(models.User)
+        .filter(models.User.id == user_id)
         .first()
-
     )
 
-
     if not user:
-
         raise HTTPException(
-
             status_code=404,
-
             detail="User not found"
-
         )
 
+    if user.status == "deactivated":
+        raise HTTPException(
+            status_code=400,
+            detail="Account is already deactivated"
+        )
 
-    # Deactivate account
     user.status = "deactivated"
 
 
-    # =====================================================
+# =====================================================
     # SECURITY EVENT
     # =====================================================
 

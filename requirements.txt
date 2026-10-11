@@ -6,3 +6,4 @@ python-dotenv
 pydantic[email]
 requests
 argon2-cffi
+PyJWT

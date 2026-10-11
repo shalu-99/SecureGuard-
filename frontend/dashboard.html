@@ -632,6 +632,17 @@ footer{
 
     </section>
 
+    <!-- LOGIN HISTORY -->
+    <section class="panel">
+        <div class="panel-head">
+            <h3>Login History</h3>
+            <span>RECENT SIGN-IN ACTIVITY</span>
+        </div>
+        <div id="loginHistoryList" class="activity-box">
+            <div class="empty">Loading login history...</div>
+        </div>
+    </section>
+
     <!-- ACTIVITY -->
     <section class="panel activity">
 
@@ -754,7 +765,61 @@ async function loadAlerts(){
 
 }
 
+
+async function loadLoginHistory() {
+    const list = document.getElementById("loginHistoryList");
+    const token = sessionStorage.getItem("secureguard_token");
+
+    if (!token) {
+        list.innerHTML = '<div class="empty">Please log in to view your login history.</div>';
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/login-history", {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (response.status === 401) {
+            list.innerHTML = '<div class="empty">Session expired. Please log in again.</div>';
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error("Unable to load login history");
+        }
+
+        const history = await response.json();
+
+        if (!history.length) {
+            list.innerHTML = '<div class="empty">No login history found.</div>';
+            return;
+        }
+
+        list.innerHTML = history.map(item => {
+            const status = item.success ? "Success" : "Failed";
+            const time = item.timestamp
+                ? new Date(item.timestamp).toLocaleString()
+                : "Unknown time";
+            const ip = item.ip_address || "Unavailable";
+
+            return `
+                <div class="activity-row">
+                    <span>${status} · ${time}</span>
+                    <span>${ip}</span>
+                </div>
+            `;
+        }).join("");
+    } catch (error) {
+        console.error("Login history error:", error);
+        list.innerHTML = '<div class="empty">Unable to load login history.</div>';
+    }
+}
+
 loadAlerts();
+loadLoginHistory();
 
 setInterval(loadAlerts,5000);
 
