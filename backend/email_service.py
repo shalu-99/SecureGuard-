@@ -30,7 +30,7 @@ def send_security_alert(to_email: str, subject: str, message: str):
         )
 
         print("RESEND STATUS:", response.status_code)
-        print("RESEND RESPONSE:", response.text)
+        print("RESEND REQUEST COMPLETED:", response.status_code)
 
         if response.ok:
             print("EMAIL SENT SUCCESSFULLY")

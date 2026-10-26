@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "SecureGuard Login Monitor",
+  "version": "1.0.0",
+  "description": "Monitors supported website login events and reports them to SecureGuard.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:8000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "SecureGuard Login Monitor"
+  }
+}

@@ -645,30 +645,13 @@ footer{
 
     <!-- ACTIVITY -->
     <section class="panel activity">
-
         <div class="panel-head">
             <h3>Security Activity Monitor</h3>
-            <span>LIVE SYSTEM VIEW</span>
+            <span>RECENT USER ACTIVITY</span>
         </div>
-
-        <div class="activity-box">
-
-            <div class="activity-row">
-                <span>Monitoring Engine</span>
-                <span>ACTIVE</span>
-            </div>
-
-            <div class="activity-line">
-                <span></span>
-            </div>
-
-            <div class="activity-row">
-                <span>API → Database → Security Layer</span>
-                <span>CONNECTED</span>
-            </div>
-
+        <div class="activity-box" id="userActivityList">
+            <div class="empty">Loading user activity...</div>
         </div>
-
     </section>
 
 </main>
@@ -680,11 +663,99 @@ footer{
 
 <script>
 
+// Redirect users who are not logged in.
+if (!sessionStorage.getItem("secureguard_token")) {
+    window.location.replace("/login.html");
+}
+
+
+async function recordActivity(eventType, details) {
+    const token = sessionStorage.getItem("secureguard_token");
+    if (!token) return;
+
+    try {
+        const response = await fetch("/api/activity", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                event_type: eventType,
+                details: details
+            })
+        });
+
+        if (!response.ok) {
+            console.warn("Activity recording failed:", response.status);
+        }
+    } catch (error) {
+        console.warn("Could not record activity:", error);
+    }
+}
+
+async function loadUserActivity() {
+    const list = document.getElementById("userActivityList");
+    const token = sessionStorage.getItem("secureguard_token");
+    if (!list || !token) return;
+
+    try {
+        const response = await fetch("/api/activity", {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error("Activity API unavailable");
+
+        const events = await response.json();
+        list.replaceChildren();
+
+        if (!events.length) {
+            list.textContent = "No user activity recorded yet.";
+            return;
+        }
+
+        for (const event of events) {
+            const row = document.createElement("div");
+            row.className = "activity-row";
+
+            const description = document.createElement("span");
+            description.textContent = event.event_type === "possible_external_login"
+                ? "Possible external login (not confirmed) · " + (event.details || "Website unavailable")
+                : (event.details || event.event_type || "Activity") + " · " + (event.event_type || "");
+
+            const ip = document.createElement("span");
+            ip.textContent = "IP: " + (event.ip_address || "Unavailable");
+
+            const time = document.createElement("span");
+            time.textContent = event.timestamp
+                ? new Date(event.timestamp).toLocaleString()
+                : "Time unavailable";
+
+            row.append(description, ip, time);
+            list.appendChild(row);
+        }
+    } catch (error) {
+        console.error("User activity error:", error);
+        list.textContent = "Unable to load user activity.";
+    }
+}
+
 async function loadAlerts(){
 
     try{
 
-        const response = await fetch("/api/alerts");
+        const token = sessionStorage.getItem("secureguard_token");
+
+        if (!token) {
+            window.location.href = "/login.html";
+            return;
+        }
+
+        const response = await fetch("/api/alerts", {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
 
         if(!response.ok){
             throw new Error("Unable to load alerts");
@@ -704,62 +775,49 @@ async function loadAlerts(){
 
         if(alerts.length === 0){
 
-            list.innerHTML = `
-                <div class="empty">
-                    No security alerts detected.
-                </div>
-            `;
+            list.textContent = "No security alerts detected.";
 
             return;
         }
 
-        list.innerHTML = alerts.slice(0,10).map(alert => {
+        list.replaceChildren();
 
-            const severity =
-                String(alert.severity || "medium").toUpperCase();
+        for (const alert of alerts.slice(0, 10)) {
+            const card = document.createElement("div");
+            card.className = "alert";
 
-            const message =
-                alert.message || "Security event detected";
+            const dot = document.createElement("div");
+            dot.className = "alert-dot";
 
-            const user =
-                alert.user_id ? "User ID " + alert.user_id : "System";
+            const content = document.createElement("div");
 
-            const time =
-                alert.created_at
+            const heading = document.createElement("h4");
+            heading.textContent = alert.message || "Security event detected";
+
+            const detail = document.createElement("p");
+            const user = alert.user_id ? "User ID " + alert.user_id : "System";
+            const time = alert.created_at
                 ? new Date(alert.created_at).toLocaleString()
                 : "Recent";
+            detail.textContent = user + " • " + time;
 
-            return `
-                <div class="alert">
+            content.append(heading, detail);
 
-                    <div class="alert-dot"></div>
+            const badge = document.createElement("div");
+            badge.className = "badge";
+            badge.textContent = String(alert.severity || "medium").toUpperCase();
 
-                    <div>
-                        <h4>${message}</h4>
-                        <p>
-                            ${user} • ${time}
-                        </p>
-                    </div>
-
-                    <div class="badge">
-                        ${severity}
-                    </div>
-
-                </div>
-            `;
-
-        }).join("");
+            card.append(dot, content, badge);
+            list.appendChild(card);
+        }
 
     }
     catch(error){
 
         console.error(error);
 
-        document.getElementById("alertList").innerHTML = `
-            <div class="empty">
-                Unable to connect to security API.
-            </div>
-        `;
+        document.getElementById("alertList").textContent =
+            "Unable to connect to security API.";
 
     }
 
@@ -771,7 +829,7 @@ async function loadLoginHistory() {
     const token = sessionStorage.getItem("secureguard_token");
 
     if (!token) {
-        list.innerHTML = '<div class="empty">Please log in to view your login history.</div>';
+        list.textContent = "Please log in to view your login history.";
         return;
     }
 
@@ -783,7 +841,7 @@ async function loadLoginHistory() {
         });
 
         if (response.status === 401) {
-            list.innerHTML = '<div class="empty">Session expired. Please log in again.</div>';
+            list.textContent = "Session expired. Please log in again.";
             return;
         }
 
@@ -794,34 +852,74 @@ async function loadLoginHistory() {
         const history = await response.json();
 
         if (!history.length) {
-            list.innerHTML = '<div class="empty">No login history found.</div>';
+            list.textContent = "No login history found.";
             return;
         }
 
-        list.innerHTML = history.map(item => {
-            const status = item.success ? "Success" : "Failed";
-            const time = item.timestamp
+        list.replaceChildren();
+
+        for (const item of history) {
+            const row = document.createElement("div");
+            row.className = "activity-row";
+
+            const status = document.createElement("span");
+            status.textContent = item.success ? "Success" : "Failed";
+
+            const time = document.createElement("span");
+            time.textContent = item.timestamp
                 ? new Date(item.timestamp).toLocaleString()
                 : "Unknown time";
-            const ip = item.ip_address || "Unavailable";
 
-            return `
-                <div class="activity-row">
-                    <span>${status} · ${time}</span>
-                    <span>${ip}</span>
-                </div>
-            `;
-        }).join("");
+            const ip = document.createElement("span");
+            ip.textContent = item.ip_address || "Unavailable";
+
+            status.textContent += " · " + time.textContent;
+            row.append(status, ip);
+            list.appendChild(row);
+        }
     } catch (error) {
         console.error("Login history error:", error);
-        list.innerHTML = '<div class="empty">Unable to load login history.</div>';
+        list.textContent = "Unable to load login history.";
     }
 }
 
 loadAlerts();
 loadLoginHistory();
 
+(async function initializeActivityTracking() {
+    const alertsSection =
+        document.getElementById("alertList")?.closest("section");
+    const historySection =
+        document.getElementById("loginHistoryList")?.closest("section");
+
+    if (alertsSection) {
+        alertsSection.addEventListener("click", async () => {
+            if (alertsSection.dataset.activityTracked) return;
+            alertsSection.dataset.activityTracked = "true";
+            await recordActivity("alerts_view", "User opened the alerts section");
+            await loadUserActivity();
+        });
+    }
+
+    if (historySection) {
+        historySection.addEventListener("click", async () => {
+            if (historySection.dataset.activityTracked) return;
+            historySection.dataset.activityTracked = "true";
+            await recordActivity(
+                "login_history_view",
+                "User opened the login history section"
+            );
+            await loadUserActivity();
+        });
+    }
+
+    await recordActivity("dashboard_open", "User opened the SecureGuard dashboard");
+    await loadUserActivity();
+})();
+
+
 setInterval(loadAlerts,5000);
+setInterval(loadUserActivity,10000);
 
 </script>
 

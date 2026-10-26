@@ -1,7 +1,8 @@
 import os
 import jwt
 from datetime import datetime, timedelta, timezone
-from fastapi import FastAPI, Depends, HTTPException, Header
+from fastapi import FastAPI, Depends, HTTPException, Header, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from sqlalchemy import text
@@ -10,12 +11,20 @@ from pathlib import Path
 
 from backend.database import engine, Base, get_db
 from backend import models
-from backend.schemas import RegisterRequest, LoginRequest
+from backend.schemas import RegisterRequest, LoginRequest, ActivityEventRequest, ExternalLoginEventRequest
 from backend.auth import hash_password, verify_password, needs_rehash
 from backend.email_service import send_security_alert
 
 
 app = FastAPI(title="SecureGuard API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["chrome-extension://bffjjjpijhejdojfeaenijcjbfpinpgj"],
+    allow_credentials=False,
+    allow_methods=["POST", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
+)
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 if not JWT_SECRET_KEY or JWT_SECRET_KEY == "PASTE_YOUR_GENERATED_SECRET_HERE":
@@ -264,6 +273,7 @@ SecureGuard Security Team
 @app.post("/api/login")
 def login(
     login_data: LoginRequest,
+    request: Request,
     db: Session = Depends(get_db)
 ):
 
@@ -322,7 +332,7 @@ def login(
 
             user_id=user.id,
 
-            ip_address="live-test",
+            ip_address=(request.client.host if request.client else "unknown"),
 
             success=False
 
@@ -447,7 +457,7 @@ SecureGuard Security Team
 
         user_id=user.id,
 
-        ip_address="live-test",
+        ip_address=(request.client.host if request.client else "unknown"),
 
         success=True
 
@@ -536,6 +546,7 @@ def get_alerts(
 @app.post("/api/account/deactivate/{user_id}")
 def deactivate_account(
     user_id: int,
+    request: Request,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -578,8 +589,9 @@ def deactivate_account(
         event_type=
             "account_deactivation",
 
-        ip_address=
-            "live-test",
+        ip_address=(
+            request.client.host if request.client else "unknown"
+        ),
 
         details=
             "User account was deactivated"
@@ -652,4 +664,99 @@ SecureGuard Security Team
         "email_sent":
             email_sent
 
+    }
+
+# =========================================================
+# AUTHENTICATED USER ACTIVITY TRACKING
+# =========================================================
+
+@app.post("/api/activity")
+def record_user_activity(
+    activity: ActivityEventRequest,
+    request: Request,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    client_ip = request.client.host if request.client else None
+
+    event = models.SecurityEvent(
+        user_id=current_user.id,
+        event_type=activity.event_type,
+        ip_address=client_ip,
+        details=activity.details or "User activity recorded"
+    )
+
+    db.add(event)
+    db.commit()
+    db.refresh(event)
+
+    return {
+        "message": "Activity recorded",
+        "event_id": event.id,
+        "event_type": event.event_type,
+        "timestamp": event.timestamp
+    }
+
+
+@app.get("/api/activity")
+def get_user_activity(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    events = (
+        db.query(models.SecurityEvent)
+        .filter(models.SecurityEvent.user_id == current_user.id)
+        .order_by(models.SecurityEvent.timestamp.desc())
+        .limit(30)
+        .all()
+    )
+
+    return [
+        {
+            "id": event.id,
+            "event_type": event.event_type,
+            "details": event.details,
+            "ip_address": event.ip_address,
+            "timestamp": event.timestamp
+        }
+        for event in events
+    ]
+
+
+@app.post("/api/external-login")
+def record_external_login(
+    activity: ExternalLoginEventRequest,
+    request: Request,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    website = activity.website.strip().lower()
+
+    if activity.signal != "possible_post_login_navigation":
+        raise HTTPException(status_code=400, detail="Unsupported activity signal")
+
+    if not website or "/" in website or "@" in website:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid website hostname"
+        )
+
+    client_ip = request.client.host if request.client else None
+
+    event = models.SecurityEvent(
+        user_id=current_user.id,
+        event_type="possible_external_login",
+        ip_address=client_ip,
+        details=f"Website: {website} | {activity.details}"
+    )
+
+    db.add(event)
+    db.commit()
+    db.refresh(event)
+
+    return {
+        "message": "External login event recorded",
+        "event_id": event.id,
+        "website": website,
+        "timestamp": event.timestamp
     }
