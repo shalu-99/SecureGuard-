@@ -632,6 +632,37 @@ footer{
 
     </section>
 
+    <!-- EMAIL BREACH CHECKER -->
+    <section class="panel" id="breachChecker">
+        <div class="panel-head">
+            <h3>Email Breach Checker</h3>
+            <span>BREACH DATABASE LOOKUP</span>
+        </div>
+
+        <p>Check whether an email address appears in known data-breach records.</p>
+
+        <form id="breachCheckForm">
+            <input
+                type="email"
+                id="breachEmail"
+                placeholder="Enter email address"
+                required
+                autocomplete="email"
+                style="width:100%;max-width:420px;padding:12px;margin:8px 0;border-radius:8px;"
+            >
+            <button type="submit" id="breachCheckButton">Check Email</button>
+        </form>
+
+        <div id="breachCheckStatus" role="status" aria-live="polite"></div>
+        <div id="breachCheckResults" class="activity-box"></div>
+
+        <small>
+            Results come from XposedOrNot breach records. A result does not prove
+            that an account is currently active. The email is sent to the external
+            breach-check service for lookup.
+        </small>
+    </section>
+
     <!-- LOGIN HISTORY -->
     <section class="panel">
         <div class="panel-head">
@@ -921,6 +952,62 @@ loadLoginHistory();
 setInterval(loadAlerts,5000);
 setInterval(loadUserActivity,10000);
 
+</script>
+
+
+<script>
+document.getElementById("breachCheckForm")?.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const email = document.getElementById("breachEmail").value.trim();
+    const button = document.getElementById("breachCheckButton");
+    const status = document.getElementById("breachCheckStatus");
+    const results = document.getElementById("breachCheckResults");
+
+    button.disabled = true;
+    status.textContent = "Checking known breach records...";
+    results.replaceChildren();
+
+    try {
+        const response = await fetch("/api/breach-check", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Unable to check this email right now.");
+        }
+
+        if (data.breached && data.breaches.length > 0) {
+            status.textContent = "Warning: this email appears in known breach records.";
+            const heading = document.createElement("h4");
+            heading.textContent = "Matched breach records (" + data.breaches.length + ")";
+            results.appendChild(heading);
+
+            const list = document.createElement("ul");
+            data.breaches.forEach(function(name) {
+                const item = document.createElement("li");
+                item.textContent = name;
+                list.appendChild(item);
+            });
+            results.appendChild(list);
+        } else {
+            status.textContent = "No matching breach records were returned.";
+        }
+
+        const note = document.createElement("p");
+        note.textContent = "Source: XposedOrNot. Results cover known records only and do not confirm whether an account is currently active.";
+        results.appendChild(note);
+
+    } catch (error) {
+        status.textContent = error.message || "Something went wrong. Please try again.";
+    } finally {
+        button.disabled = false;
+    }
+});
 </script>
 
 </body>
