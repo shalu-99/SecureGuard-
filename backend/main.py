@@ -1,3 +1,5 @@
+import requests
+from pydantic import EmailStr, BaseModel
 import os
 import jwt
 from datetime import datetime, timedelta, timezone
@@ -15,6 +17,9 @@ from backend.schemas import RegisterRequest, LoginRequest, ActivityEventRequest,
 from backend.auth import hash_password, verify_password, needs_rehash
 from backend.email_service import send_security_alert
 
+
+class BreachCheckRequest(BaseModel):
+    email: EmailStr
 
 app = FastAPI(title="SecureGuard API")
 
@@ -35,6 +40,30 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 # =========================================================
+@app.post("/api/breach-check")
+def check_email_breaches(data: BreachCheckRequest):
+    email = str(data.email).strip()
+    try:
+        response = requests.get(
+            f"https://api.xposedornot.com/v1/check-email/{email}",
+            timeout=10
+        )
+        if response.status_code == 404:
+            return {"email": email, "breached": False, "breaches": []}
+        response.raise_for_status()
+        result = response.json()
+        breaches = result.get("breaches", [])
+        if breaches and isinstance(breaches[0], list):
+            breaches = breaches[0]
+        return {"email": email, "breached": bool(breaches), "breaches": breaches}
+    except requests.Timeout:
+        raise HTTPException(status_code=504, detail="Breach-check service timed out. Try again.")
+    except requests.RequestException:
+        raise HTTPException(status_code=502, detail="Breach-check service is temporarily unavailable.")
+    except ValueError:
+        raise HTTPException(status_code=502, detail="Invalid response from breach-check service.")
+
+
 # DATABASE TABLE CREATION
 # =========================================================
 
